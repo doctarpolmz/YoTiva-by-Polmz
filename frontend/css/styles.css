@@ -139,7 +139,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 .main-content { grid-area: main; padding: var(--space-6); overflow-y: auto; }
 
 /* ---------- KPI cards ---------- */
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-6); }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-6); }
 .kpi-card {
   display: flex; flex-direction: column; justify-content: space-between; min-height: 96px;
   background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md);
@@ -233,4 +233,8 @@ td.num { text-align: right; }
   .main-content { padding: var(--space-3); padding-bottom: 72px; }
   .pos-layout { grid-template-columns: 1fr; height: auto; }
   .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--space-2); }
+}
+
+@media (min-width: 900px) {
+  .mobile-only { display: none !important; }
 }
