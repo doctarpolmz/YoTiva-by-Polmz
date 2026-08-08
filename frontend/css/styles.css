@@ -61,6 +61,12 @@ button { font-family: inherit; }
 
 .mono, .kpi-value, td.num, .price { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
+/* Component rules below set display:flex/grid on elements that also use the
+   `hidden` attribute for show/hide (see auth.js). Author styles always beat
+   the UA's default [hidden] rule regardless of source order or specificity,
+   so without this, toggling `.hidden = true` no longer hides the element. */
+[hidden] { display: none !important; }
+
 /* ---------- Buttons ---------- */
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
