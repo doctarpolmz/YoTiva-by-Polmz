@@ -1,0 +1,10 @@
+# Netlify configuration: publish the frontend folder and enable SPA redirects
+[build]
+  publish = "frontend"
+  # No build command needed for plain static site. If you add a build step, set it here.
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = true

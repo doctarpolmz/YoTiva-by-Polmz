@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>YoTiva by Polmz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- LOGIN VIEW -->
+<div id="loginView" class="login-screen">
+  <form id="loginForm" class="login-card">
+    <div class="login-brand">YoTiva by Polmz</div>
+    <p class="login-sub">Business Manager</p>
+    <label class="field">
+      <span>Email</span>
+      <input type="email" id="loginEmail" required autocomplete="username">
+    </label>
+    <label class="field">
+      <span>Password</span>
+      <input type="password" id="loginPassword" required autocomplete="current-password">
+    </label>
+    <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+    <div id="loginError" class="form-error" hidden></div>
+  </form>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell" class="app-shell" hidden>
+  <aside class="sidebar">
+    <div class="sidebar-brand">YoTiva by Polmz</div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <a href="#" data-view="dashboard" class="nav-item active">Dashboard</a>
+      <a href="#" data-view="pos" class="nav-item">Point of Sale</a>
+      <a href="#" data-view="inventory" class="nav-item">Inventory</a>
+      <a href="#" data-view="sales" class="nav-item">Sales</a>
+      <a href="#" data-view="purchases" class="nav-item">Purchasing</a>
+      <a href="#" data-view="customers" class="nav-item">Customers</a>
+      <a href="#" data-view="suppliers" class="nav-item">Suppliers</a>
+      <a href="#" data-view="expenses" class="nav-item">Expenses</a>
+      <a href="#" data-view="reports" class="nav-item">Reports</a>
+      <a href="#" data-view="alerts" class="nav-item">Alerts</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <span id="userName">-</span>
+        <span id="userRole" class="user-role">-</span>
+      </div>
+      <button id="logoutBtn" class="btn btn-ghost btn-block">Sign out</button>
+    </div>
+  </aside>
+
+  <header class="topbar">
+    <button id="mobileMenuBtn" class="icon-btn mobile-only" aria-label="Menu">&#9776;</button>
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div class="topbar-search">
+      <input type="search" id="globalSearch" placeholder="Search products, customers, sales...">
+    </div>
+  </header>
+
+  <main class="main-content" id="mainContent">
+    <!-- views injected by app.js -->
+  </main>
+
+  <nav class="bottom-nav mobile-only">
+    <a href="#" data-view="dashboard" class="bnav-item active">Home</a>
+    <a href="#" data-view="pos" class="bnav-item">Sell</a>
+    <a href="#" data-view="inventory" class="bnav-item">Stock</a>
+    <a href="#" data-view="reports" class="bnav-item">Reports</a>
+  </nav>
+</div>
+
+<div id="toastHost" class="toast-host" aria-live="polite"></div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/pos.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
