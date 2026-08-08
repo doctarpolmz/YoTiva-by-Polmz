@@ -165,7 +165,7 @@ const POS = {
       el('label', { class: 'field' }, [el('span', {}, ['Customer (optional, required for credit)']), el('select', { id: 'ckCustomer' }, [el('option', { value: '' }, ['Select customer'])])]),
       el('label', { class: 'field' }, [el('span', {}, ['Discount']), el('input', { type: 'number', id: 'ckDiscount', value: '0', min: '0', step: '0.01', inputmode: 'decimal', enterkeyhint: 'done' })]),
       el('label', { class: 'field' }, [el('span', {}, ['Sale Notes']), el('input', { id: 'ckNotes', placeholder: 'Optional order note' })]),
-      el('div', { class: 'row', style: 'display:flex;justify-content:space-between;font-size:16px;font-weight:700;margin-bottom:16px;' }, [
+      el('div', { class: 'checkout-summary' }, [
         el('span', {}, ['Subtotal']), el('span', { class: 'mono' }, [fmtMoney(subtotal)])
       ]),
       el('label', { class: 'field' }, [el('span', {}, ['Payment Method']),
