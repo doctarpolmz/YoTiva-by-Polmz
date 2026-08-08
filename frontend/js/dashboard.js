@@ -20,9 +20,10 @@ const Dashboard = {
   },
 
   buildKpis: function (d) {
+    const yesterday = d.trend && d.trend.length >= 2 ? d.trend[d.trend.length - 2] : null;
     const cards = [
-      { label: "Today's Sales", value: fmtMoney(d.todayRevenue), view: 'sales' },
-      { label: "Today's Profit", value: fmtMoney(d.todayProfit), view: 'reports' },
+      { label: "Today's Sales", value: fmtMoney(d.todayRevenue), view: 'sales', trend: Dashboard.trendVs(d.todayRevenue, yesterday && yesterday.revenue) },
+      { label: "Today's Profit", value: fmtMoney(d.todayProfit), view: 'reports', trend: Dashboard.trendVs(d.todayProfit, yesterday && yesterday.profit) },
       { label: "Today's Expenses", value: fmtMoney(d.todayExpenses), view: 'expenses' },
       { label: 'Transactions Today', value: d.todayTransactions, view: 'sales' },
       { label: 'Products Sold Today', value: d.productsSoldToday, view: 'sales' },
@@ -35,12 +36,22 @@ const Dashboard = {
     ];
     const grid = el('div', { class: 'kpi-grid' });
     cards.forEach(function (c) {
-      grid.appendChild(el('div', { class: 'kpi-card', onclick: function () { App.navigate(c.view); } }, [
+      const children = [
         el('div', { class: 'kpi-label' }, [c.label]),
         el('div', { class: 'kpi-value' + (c.tone ? ' ' + c.tone : '') }, [String(c.value)])
-      ]));
+      ];
+      if (c.trend) children.push(el('div', { class: 'kpi-sub' + (c.trend.tone ? ' ' + c.trend.tone : '') }, [c.trend.text]));
+      grid.appendChild(el('div', { class: 'kpi-card' + (c.tone ? ' tone-' + c.tone : ''), onclick: function () { App.navigate(c.view); } }, children));
     });
     return grid;
+  },
+
+  /** Percentage change vs. the prior day, as a "+12% vs yesterday" style label. */
+  trendVs: function (current, previous) {
+    if (previous === null || previous === undefined || previous === 0) return null;
+    const pct = Math.round(((current - previous) / previous) * 1000) / 10;
+    if (pct === 0) return { text: 'Flat vs yesterday', tone: '' };
+    return { text: (pct > 0 ? '▲ +' : '▼ ') + pct + '% vs yesterday', tone: pct > 0 ? 'success' : 'danger' };
   },
 
   buildInsights: function (d) {
