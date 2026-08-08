@@ -101,7 +101,7 @@ const Views = {
   sales: function (container) {
     container.innerHTML = '';
     const panel = el('div', { class: 'panel' }, [el('h2', {}, ['Sales History'])]);
-    const wrap = el('div', { class: 'table-wrap', id: 'salesWrap' }, [el('div', { class: 'empty-state' }, ['Loading...'])]);
+    const wrap = el('div', { class: 'table-wrap', id: 'salesWrap' }, [skeletonTable(5)]);
     panel.appendChild(wrap);
     container.appendChild(panel);
     Api.call('listSales', {}).then(function (sales) {
@@ -131,7 +131,7 @@ const Views = {
         Auth.can('purchases.manage') ? el('button', { class: 'btn btn-primary', onclick: Views.openPurchaseOrderModal }, ['+ New Purchase Order']) : ''
       ])
     ]);
-    const wrap = el('div', { class: 'table-wrap', id: 'poWrap' }, [el('div', { class: 'empty-state' }, ['Loading...'])]);
+    const wrap = el('div', { class: 'table-wrap', id: 'poWrap' }, [skeletonTable(5)]);
     panel.appendChild(wrap);
     container.appendChild(panel);
     Api.call('listPurchases', {}).then(function (rows) {
@@ -149,7 +149,7 @@ const Views = {
             ? el('td', {}, [
               (function () {
                 const statuses = ['ORDERED','APPROVED','REJECTED','CANCELLED','IN_TRANSIT','SHIPPED','PARTIALLY_RECEIVED','RECEIVED','BACKORDERED','CLOSED'];
-                const select = el('select', { class: 'po-status', 'data-po': p.PurchaseID }, []);
+                const select = el('select', { class: 'po-status', 'data-po': p.PurchaseID, 'data-status': p.Status }, []);
                 statuses.forEach(function (s) {
                   const option = el('option', { value: s }, [s.replace(/_/g, ' ')]);
                   if (s === p.Status) option.selected = true;
@@ -159,7 +159,7 @@ const Views = {
                 return select;
               })()
             ])
-            : el('td', {}, [el('span', { class: 'badge badge-info' }, [p.Status])])
+            : el('td', {}, [el('span', { class: poStatusBadgeClass(p.Status) }, [p.Status])])
           )
         ]));
       });
@@ -173,8 +173,8 @@ const Views = {
       el('div', { class: 'modal-header' }, [el('h2', {}, ['New Purchase Order']), el('button', { class: 'icon-btn', onclick: closeModal }, ['×'])]),
       el('label', { class: 'field' }, [el('span', {}, ['Supplier']), el('select', { id: 'poSupplier' }, [el('option', { value: '' }, ['Loading suppliers...'])])]),
       el('label', { class: 'field' }, [el('span', {}, ['Product']), el('select', { id: 'poProduct' }, [el('option', { value: '' }, ['Loading products...'])])]),
-      el('label', { class: 'field' }, [el('span', {}, ['Quantity']), el('input', { id: 'poQty', type: 'number', value: '1', min: '1' })]),
-      el('label', { class: 'field' }, [el('span', {}, ['Unit Cost']), el('input', { id: 'poCost', type: 'number', step: '0.01', value: '0' })]),
+      el('label', { class: 'field' }, [el('span', {}, ['Quantity']), el('input', { id: 'poQty', type: 'number', value: '1', min: '1', inputmode: 'numeric', enterkeyhint: 'done' })]),
+      el('label', { class: 'field' }, [el('span', {}, ['Unit Cost']), el('input', { id: 'poCost', type: 'number', step: '0.01', value: '0', inputmode: 'decimal', enterkeyhint: 'done' })]),
       el('button', { class: 'btn btn-primary btn-block', onclick: Views.submitPurchaseOrder }, ['Create Purchase Order'])
     ]);
     openModal(content);
@@ -233,6 +233,7 @@ const Views = {
     Api.call('updatePurchaseStatus', { purchaseId: purchaseId, status: status }).then(function (res) {
       toast('Purchase status updated: ' + res.status, 'success');
       if (select) {
+        select.dataset.status = res.status;
         Array.from(select.options).forEach(function (opt) { opt.selected = opt.value === res.status; });
       }
       Views.purchases(document.getElementById('mainContent'));
@@ -261,7 +262,7 @@ const Views = {
         ])
       ])
     ]);
-    const wrap = el('div', { class: 'table-wrap', id: 'genWrap' }, [el('div', { class: 'empty-state' }, ['Loading...'])]);
+    const wrap = el('div', { class: 'table-wrap', id: 'genWrap' }, [skeletonTable(3)]);
     panel.appendChild(wrap);
     container.appendChild(panel);
     Views.loadSimpleList(cfg);
@@ -287,7 +288,7 @@ const Views = {
         ])
       ])
     ]);
-    const wrap = el('div', { class: 'table-wrap', id: 'genWrap' }, [el('div', { class: 'empty-state' }, ['Loading...'])]);
+    const wrap = el('div', { class: 'table-wrap', id: 'genWrap' }, [skeletonTable(3)]);
     panel.appendChild(wrap);
     container.appendChild(panel);
     Views.loadSimpleList(cfg);
@@ -299,7 +300,7 @@ const Views = {
       el('div', { class: 'panel-header' }, [el('h2', {}, ['Expenses']),
         Auth.can('expenses.manage') ? el('button', { class: 'btn btn-primary', onclick: Views.newExpense }, ['+ Record Expense']) : '']),
     ]);
-    const wrap = el('div', { class: 'table-wrap', id: 'expWrap' }, [el('div', { class: 'empty-state' }, ['Loading...'])]);
+    const wrap = el('div', { class: 'table-wrap', id: 'expWrap' }, [skeletonTable(4)]);
     panel.appendChild(wrap);
     container.appendChild(panel);
     Views.loadExpenses();
@@ -329,7 +330,7 @@ const Views = {
     const content = el('div', {}, [
       el('div', { class: 'modal-header' }, [el('h2', {}, ['Record Expense']), el('button', { class: 'icon-btn', onclick: closeModal }, ['\u00d7'])]),
       el('label', { class: 'field' }, [el('span', {}, ['Category']), el('input', { id: 'expCat' })]),
-      el('label', { class: 'field' }, [el('span', {}, ['Amount']), el('input', { id: 'expAmt', type: 'number', step: '0.01' })]),
+      el('label', { class: 'field' }, [el('span', {}, ['Amount']), el('input', { id: 'expAmt', type: 'number', step: '0.01', inputmode: 'decimal', enterkeyhint: 'done' })]),
       el('label', { class: 'field' }, [el('span', {}, ['Payment Method']),
         el('select', { id: 'expMethod' }, [el('option', {}, ['CASH']), el('option', {}, ['MOBILE_MONEY']), el('option', {}, ['BANK'])])]),
       el('label', { class: 'field' }, [el('span', {}, ['Description']), el('input', { id: 'expDesc' })]),
@@ -348,7 +349,7 @@ const Views = {
     const content = el('div', {}, [
       el('div', { class: 'modal-header' }, [el('h2', {}, ['Record Customer Payment']), el('button', { class: 'icon-btn', onclick: closeModal }, ['×'])]),
       el('label', { class: 'field' }, [el('span', {}, ['Customer']), el('select', { id: 'custPayCustomer' }, [el('option', { value: '' }, ['Loading customers...'])])]),
-      el('label', { class: 'field' }, [el('span', {}, ['Amount']), el('input', { id: 'custPayAmount', type: 'number', step: '0.01', value: '0' })]),
+      el('label', { class: 'field' }, [el('span', {}, ['Amount']), el('input', { id: 'custPayAmount', type: 'number', step: '0.01', value: '0', inputmode: 'decimal', enterkeyhint: 'done' })]),
       el('label', { class: 'field' }, [el('span', {}, ['Payment Method']),
         el('select', { id: 'custPayMethod' }, [el('option', {}, ['CASH']), el('option', {}, ['MOBILE_MONEY']), el('option', {}, ['BANK']), el('option', {}, ['CARD'])])]),
       el('button', { class: 'btn btn-primary btn-block', onclick: Views.submitCustomerPayment }, ['Save Payment'])
@@ -387,7 +388,7 @@ const Views = {
       el('div', { class: 'modal-header' }, [el('h2', {}, ['Record Supplier Payment']), el('button', { class: 'icon-btn', onclick: closeModal }, ['×'])]),
       el('label', { class: 'field' }, [el('span', {}, ['Supplier']), el('select', { id: 'supPaySupplier' }, [el('option', { value: '' }, ['Loading suppliers...'])])]),
       el('label', { class: 'field' }, [el('span', {}, ['Purchase ID']), el('input', { id: 'supPayPurchaseId' })]),
-      el('label', { class: 'field' }, [el('span', {}, ['Amount']), el('input', { id: 'supPayAmount', type: 'number', step: '0.01', value: '0' })]),
+      el('label', { class: 'field' }, [el('span', {}, ['Amount']), el('input', { id: 'supPayAmount', type: 'number', step: '0.01', value: '0', inputmode: 'decimal', enterkeyhint: 'done' })]),
       el('label', { class: 'field' }, [el('span', {}, ['Payment Method']),
         el('select', { id: 'supPayMethod' }, [el('option', {}, ['CASH']), el('option', {}, ['MOBILE_MONEY']), el('option', {}, ['BANK']), el('option', {}, ['CARD'])])]),
       el('button', { class: 'btn btn-primary btn-block', onclick: Views.submitSupplierPayment }, ['Save Payment'])
@@ -423,7 +424,12 @@ const Views = {
 
   reports: function (container) {
     container.innerHTML = '';
-    const panel = el('div', { class: 'panel' }, [el('h2', {}, ['Reports Center'])]);
+    const panel = el('div', { class: 'panel' }, [
+      el('div', { class: 'panel-header' }, [
+        el('h2', {}, ['Reports Center']),
+        el('button', { class: 'btn btn-ghost btn-sm', id: 'reportExportBtn', onclick: Views.exportCurrentReport }, ['Export CSV'])
+      ])
+    ]);
     const buttons = el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;' });
     [['SALES_BY_PRODUCT', 'Sales by Product'], ['SALES_BY_CATEGORY', 'Sales by Category'],
       ['INVENTORY_VALUATION', 'Inventory Valuation'], ['PROFITABILITY', 'Profitability']].forEach(function (r) {
@@ -432,12 +438,15 @@ const Views = {
     panel.appendChild(buttons);
     panel.appendChild(el('div', { class: 'table-wrap', id: 'reportWrap' }, [el('div', { class: 'empty-state' }, ['Choose a report above.'])]));
     container.appendChild(panel);
+    Views.currentReport = { type: null, rows: [] };
   },
 
   loadReport: function (type) {
     const wrap = document.getElementById('reportWrap');
-    wrap.innerHTML = '<div class="empty-state">Loading...</div>';
+    wrap.innerHTML = '';
+    wrap.appendChild(skeletonTable(4));
     Api.call('getReport', { reportType: type }).then(function (rows) {
+      Views.currentReport = { type: type, rows: rows };
       wrap.innerHTML = '';
       if (!rows.length) { wrap.appendChild(el('div', { class: 'empty-state' }, ['No data for this report yet.'])); return; }
       const keys = Object.keys(rows[0]);
@@ -454,10 +463,16 @@ const Views = {
     }).catch(function (err) { wrap.innerHTML = ''; wrap.appendChild(el('div', { class: 'empty-state' }, [friendlyError(err)])); });
   },
 
+  exportCurrentReport: function () {
+    const current = Views.currentReport;
+    if (!current || !current.type) { toast('Choose a report first.', 'error'); return; }
+    exportCSV(current.rows, current.type.toLowerCase() + '.csv');
+  },
+
   alerts: function (container) {
     container.innerHTML = '';
     const panel = el('div', { class: 'panel' }, [el('h2', {}, ['Alerts Center'])]);
-    const wrap = el('div', { id: 'alertsWrap' }, [el('div', { class: 'empty-state' }, ['Loading...'])]);
+    const wrap = el('div', { id: 'alertsWrap' }, [skeletonTable(2, 4)]);
     panel.appendChild(wrap);
     container.appendChild(panel);
     Api.call('getAlerts', { status: 'OPEN' }).then(function (rows) {
@@ -482,7 +497,7 @@ const Views = {
       el('div', { class: 'panel-header' }, [el('h2', {}, [cfg.title]),
         el('button', { class: 'btn btn-primary', onclick: function () { Views.openCreateModal(cfg); } }, ['+ New ' + cfg.title.slice(0, -1)])])
     ]);
-    const wrap = el('div', { class: 'table-wrap', id: 'genWrap' }, [el('div', { class: 'empty-state' }, ['Loading...'])]);
+    const wrap = el('div', { class: 'table-wrap', id: 'genWrap' }, [skeletonTable(3)]);
     panel.appendChild(wrap);
     container.appendChild(panel);
     Views.loadSimpleList(cfg);

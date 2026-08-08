@@ -1,6 +1,9 @@
 /* auth.js */
+const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
+
 const Auth = {
   user: JSON.parse(localStorage.getItem('kyabiz_user') || 'null'),
+  idleTimer: null,
 
   init: function () {
     document.getElementById('loginForm').addEventListener('submit', function (e) {
@@ -13,6 +16,23 @@ const Auth = {
     if (Api.token && Auth.user) {
       Auth.validateSession();
     }
+    Auth.watchIdle();
+  },
+
+  /** Financial data shouldn't stay signed in on an unattended device —
+   *  sign out after 15 minutes with no clicks/taps/keystrokes. */
+  watchIdle: function () {
+    const resetTimer = function () {
+      if (!Auth.user) return;
+      clearTimeout(Auth.idleTimer);
+      Auth.idleTimer = setTimeout(function () {
+        if (Auth.user) { toast('Signed out after 15 minutes of inactivity.', 'error'); Auth.logout(); }
+      }, IDLE_TIMEOUT_MS);
+    };
+    ['mousedown', 'keydown', 'touchstart', 'scroll'].forEach(function (evt) {
+      document.addEventListener(evt, resetTimer, { passive: true });
+    });
+    resetTimer();
   },
 
   handleLogin: function () {
@@ -41,6 +61,7 @@ const Auth = {
   },
 
   logout: function () {
+    clearTimeout(Auth.idleTimer);
     Api.call('logout', {}).catch(function () {});
     Api.setToken(null);
     localStorage.removeItem('kyabiz_user');

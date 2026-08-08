@@ -56,8 +56,9 @@
   <header class="topbar">
     <button id="mobileMenuBtn" class="icon-btn mobile-only" aria-label="Menu">&#9776;</button>
     <div class="topbar-title" id="topbarTitle">Dashboard</div>
-    <div class="topbar-search">
-      <input type="search" id="globalSearch" placeholder="Search products, customers, sales...">
+    <div class="topbar-search" role="search">
+      <label for="globalSearch" class="sr-only">Search products, customers, and sales</label>
+      <input type="search" id="globalSearch" aria-label="Search products, customers, and sales" placeholder="Search products, customers, sales...">
     </div>
   </header>
 

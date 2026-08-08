@@ -1,10 +1,26 @@
 /* utils.js — formatting and small UI helpers shared across views */
 
 const CURRENCY = 'UGX';
+const CURRENCY_LOCALE = 'en-UG';
+const moneyFormatter = new Intl.NumberFormat(CURRENCY_LOCALE, {
+  style: 'currency', currency: CURRENCY, currencyDisplay: 'code',
+  minimumFractionDigits: 0, maximumFractionDigits: 2
+});
 
 function fmtMoney(n) {
-  const v = Number(n || 0);
-  return CURRENCY + ' ' + v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  return moneyFormatter.format(Number(n || 0));
+}
+
+/** Maps a Purchase Order status to the same semantic badge tone used
+ *  by the editable status select (see .po-status rules in styles.css). */
+function poStatusBadgeClass(status) {
+  const tones = {
+    ORDERED: 'badge-info', APPROVED: 'badge-info',
+    IN_TRANSIT: 'badge-warning', SHIPPED: 'badge-warning', PARTIALLY_RECEIVED: 'badge-warning',
+    RECEIVED: 'badge-success', CLOSED: 'badge-success',
+    REJECTED: 'badge-danger', CANCELLED: 'badge-danger', BACKORDERED: 'badge-danger'
+  };
+  return 'badge ' + (tones[status] || 'badge-info');
 }
 
 function fmtDate(iso) {
@@ -64,4 +80,38 @@ function debounce(fn, ms) {
     const args = arguments;
     t = setTimeout(function () { fn.apply(null, args); }, ms);
   };
+}
+
+/** Placeholder rows shown while a view's first data fetch is in flight,
+ *  standing in for a bare "Loading..." string to reduce perceived latency. */
+function skeletonTable(cols, rows) {
+  const wrap = el('div', { class: 'skeleton-table' });
+  for (let i = 0; i < (rows || 5); i++) {
+    const row = el('div', { class: 'skeleton-row' });
+    for (let c = 0; c < (cols || 4); c++) {
+      row.appendChild(el('div', { class: 'skeleton-cell' + (c === (cols || 4) - 1 ? ' short' : '') }, []));
+    }
+    wrap.appendChild(row);
+  }
+  return wrap;
+}
+
+/** Exports an array of flat objects as a downloadable CSV file. */
+function exportCSV(rows, filename) {
+  if (!rows || !rows.length) { toast('Nothing to export yet.', 'error'); return; }
+  const headers = Object.keys(rows[0]);
+  const escapeCell = function (v) {
+    const s = v === null || v === undefined ? '' : String(v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const lines = [headers.join(',')].concat(
+    rows.map(function (r) { return headers.map(function (h) { return escapeCell(r[h]); }).join(','); })
+  );
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = el('a', { href: url, download: filename || 'export.csv' }, []);
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
