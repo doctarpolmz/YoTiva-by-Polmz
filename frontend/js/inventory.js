@@ -63,15 +63,15 @@ const Inventory = {
       el('label', { class: 'field' }, [el('span', {}, ['Supplier']), el('select', { id: 'pfSupplier' }, [el('option', { value: '' }, ['None'])])]),
       el('label', { class: 'field' }, [el('span', {}, ['Location']), el('input', { id: 'pfLocation' })]),
       el('label', { class: 'field' }, [el('span', {}, ['Unit (e.g. pcs, kg, box)']), el('input', { id: 'pfUnit', value: 'pcs' })]),
-      el('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:12px;' }, [
+      el('div', { class: 'form-row-2' }, [
         el('label', { class: 'field' }, [el('span', {}, ['Cost Price']), el('input', { id: 'pfCost', type: 'number', step: '0.01' })]),
         el('label', { class: 'field' }, [el('span', {}, ['Selling Price']), el('input', { id: 'pfPrice', type: 'number', step: '0.01' })])
       ]),
-      el('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:12px;' }, [
+      el('div', { class: 'form-row-2' }, [
         el('label', { class: 'field' }, [el('span', {}, ['Opening Stock']), el('input', { id: 'pfOpening', type: 'number', value: '0' })]),
         el('label', { class: 'field' }, [el('span', {}, ['Min Stock']), el('input', { id: 'pfMinStock', type: 'number', value: '0' })])
       ]),
-      el('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:12px;' }, [
+      el('div', { class: 'form-row-2' }, [
         el('label', { class: 'field' }, [el('span', {}, ['Reorder Point']), el('input', { id: 'pfReorder', type: 'number', value: '5' })]),
         el('label', { class: 'field' }, [el('span', {}, ['Reorder Quantity']), el('input', { id: 'pfReorderQty', type: 'number', value: '0' })])
       ]),

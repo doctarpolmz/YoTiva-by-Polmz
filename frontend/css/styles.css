@@ -41,7 +41,7 @@
 }
 
 * { box-sizing: border-box; }
-html, body { height: 100%; }
+html, body { height: 100%; overflow-x: hidden; }
 body {
   margin: 0;
   font-family: var(--font-ui);
@@ -141,7 +141,10 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 .topbar-search { margin-left: auto; width: 280px; }
 .topbar-search input { width: 100%; min-height: 36px; }
 
-.main-content { grid-area: main; padding: var(--space-6); overflow-y: auto; }
+.main-content { grid-area: main; padding: var(--space-6); overflow-y: auto; overflow-x: hidden; max-width: 100%; }
+
+.dashboard-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
 
 /* ---------- KPI cards ---------- */
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-6); }
@@ -241,7 +244,7 @@ select.po-status[data-status="REJECTED"], select.po-status[data-status="CANCELLE
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
 
 /* ---------- Receipt ---------- */
-.receipt { font-family: var(--font-mono); font-size: 12px; width: 300px; margin: 0 auto; background: #fff; padding: var(--space-4); color: #000; }
+.receipt { font-family: var(--font-mono); font-size: 12px; width: 300px; max-width: 100%; margin: 0 auto; background: #fff; padding: var(--space-4); color: #000; }
 .receipt hr { border: none; border-top: 1px dashed #999; margin: 8px 0; }
 .receipt .r-row { display: flex; justify-content: space-between; }
 .receipt .r-total { font-weight: 700; font-size: 14px; }
@@ -262,6 +265,17 @@ select.po-status[data-status="REJECTED"], select.po-status[data-status="CANCELLE
   .main-content { padding: var(--space-3); padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
   .pos-layout { grid-template-columns: 1fr; height: auto; }
   .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--space-2); }
+  .dashboard-cols { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-row-2 { grid-template-columns: 1fr; }
+  .topbar { padding: 0 var(--space-3); gap: var(--space-2); }
+  .topbar-title { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .modal { padding: var(--space-4); }
+  .panel { padding: var(--space-3); }
+  .pos-cart { padding: var(--space-3); }
 }
 
 @media (min-width: 900px) {

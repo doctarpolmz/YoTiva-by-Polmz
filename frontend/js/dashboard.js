@@ -8,7 +8,7 @@ const Dashboard = {
       container.appendChild(Dashboard.buildKpis(d));
       container.appendChild(Dashboard.buildInsights(d));
 
-      const cols = el('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:16px;' }, [
+      const cols = el('div', { class: 'dashboard-cols' }, [
         Dashboard.buildLowStock(d),
         Dashboard.buildTopSelling(d)
       ]);
