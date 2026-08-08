@@ -256,9 +256,9 @@ const Views = {
     const panel = el('div', { class: 'panel' }, [
       el('div', { class: 'panel-header' }, [
         el('h2', {}, ['Customers']),
-        el('div', {}, [
+        el('div', { class: 'btn-group' }, [
           el('button', { class: 'btn btn-primary', onclick: function () { Views.openCreateModal(cfg); } }, ['+ New Customer']),
-          Auth.can('finance.view') ? el('button', { class: 'btn btn-ghost', style: 'margin-left: 8px;', onclick: Views.openCustomerPaymentModal }, ['Record Payment']) : ''
+          Auth.can('finance.view') ? el('button', { class: 'btn btn-ghost', onclick: Views.openCustomerPaymentModal }, ['Record Payment']) : ''
         ])
       ])
     ]);
@@ -282,9 +282,9 @@ const Views = {
     const panel = el('div', { class: 'panel' }, [
       el('div', { class: 'panel-header' }, [
         el('h2', {}, ['Suppliers']),
-        el('div', {}, [
+        el('div', { class: 'btn-group' }, [
           el('button', { class: 'btn btn-primary', onclick: function () { Views.openCreateModal(cfg); } }, ['+ New Supplier']),
-          Auth.can('purchases.manage') ? el('button', { class: 'btn btn-ghost', style: 'margin-left: 8px;', onclick: Views.openSupplierPaymentModal }, ['Record Payment']) : ''
+          Auth.can('purchases.manage') ? el('button', { class: 'btn btn-ghost', onclick: Views.openSupplierPaymentModal }, ['Record Payment']) : ''
         ])
       ])
     ]);
@@ -430,7 +430,7 @@ const Views = {
         el('button', { class: 'btn btn-ghost btn-sm', id: 'reportExportBtn', onclick: Views.exportCurrentReport }, ['Export CSV'])
       ])
     ]);
-    const buttons = el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;' });
+    const buttons = el('div', { class: 'report-actions' });
     [['SALES_BY_PRODUCT', 'Sales by Product'], ['SALES_BY_CATEGORY', 'Sales by Category'],
       ['INVENTORY_VALUATION', 'Inventory Valuation'], ['PROFITABILITY', 'Profitability']].forEach(function (r) {
       buttons.appendChild(el('button', { class: 'btn', onclick: function () { Views.loadReport(r[0]); } }, [r[1]]));
@@ -480,8 +480,8 @@ const Views = {
       if (!rows.length) { wrap.appendChild(el('div', { class: 'empty-state' }, ['No open alerts. Everything looks normal.'])); return; }
       rows.forEach(function (a) {
         const tone = a.Severity === 'HIGH' ? 'badge-danger' : a.Severity === 'MEDIUM' ? 'badge-warning' : 'badge-info';
-        wrap.appendChild(el('div', { style: 'display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--color-border);' }, [
-          el('div', {}, [el('span', { class: 'badge ' + tone, style: 'margin-right:8px;' }, [a.Severity]), a.Message]),
+        wrap.appendChild(el('div', { class: 'alert-row' }, [
+          el('div', { class: 'alert-message' }, [el('span', { class: 'badge alert-badge ' + tone }, [a.Severity]), a.Message]),
           el('button', { class: 'btn btn-sm btn-ghost', onclick: function () {
             Api.call('resolveAlert', { alertId: a.AlertID }).then(function () { Views.alerts(document.getElementById('mainContent')); });
           } }, ['Resolve'])
