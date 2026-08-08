@@ -1,7 +1,8 @@
 /* dashboard.js */
 const Dashboard = {
   render: function (container) {
-    container.innerHTML = '<div class="empty-state">Loading dashboard...</div>';
+    container.innerHTML = '';
+    container.appendChild(skeletonTable(4, 3));
     Api.call('getDashboard', {}).then(function (d) {
       container.innerHTML = '';
       container.appendChild(Dashboard.buildKpis(d));

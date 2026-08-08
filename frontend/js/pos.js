@@ -1,11 +1,13 @@
 /* pos.js */
+const POS_CART_DRAFT_KEY = 'yotiva_pos_cart_draft';
+
 const POS = {
   cart: [],
   products: [],
   customerId: '',
 
   render: function (container) {
-    this.cart = [];
+    this.cart = this.loadDraft();
     container.innerHTML = '';
     const layout = el('div', { class: 'pos-layout' });
 
@@ -35,8 +37,27 @@ const POS = {
       if (e.key === 'Enter') POS.scanExact(e.target.value);
     });
 
+    this.renderCart();
     this.loadProducts('');
   },
+
+  /** Cart survives an accidental refresh/tab close mid-sale; cleared once
+   *  the sale completes or the cashier explicitly clears it. */
+  loadDraft: function () {
+    try {
+      const raw = localStorage.getItem(POS_CART_DRAFT_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  },
+
+  saveDraft: function () {
+    try { localStorage.setItem(POS_CART_DRAFT_KEY, JSON.stringify(this.cart)); } catch (e) {}
+  },
+
+  clearDraft: function () {
+    try { localStorage.removeItem(POS_CART_DRAFT_KEY); } catch (e) {}
+  },
+
 
   loadProducts: function (search) {
     Api.call('listProducts', { filters: { search: search } }).then(function (products) {
@@ -96,6 +117,7 @@ const POS = {
   },
 
   renderCart: function () {
+    this.saveDraft();
     const host = document.getElementById('cartItems');
     host.innerHTML = '';
     if (!this.cart.length) {
@@ -121,7 +143,7 @@ const POS = {
       el('div', { class: 'row' }, [el('span', {}, ['Subtotal']), el('span', { id: 'posSubtotal', class: 'mono' }, [fmtMoney(0)])]),
       el('div', { class: 'row' }, [el('span', {}, ['Total']), el('span', { id: 'posTotal', class: 'mono total' }, [fmtMoney(0)])]),
       el('button', { class: 'btn btn-primary btn-block', style: 'margin-top:12px;', onclick: function () { POS.openCheckout(); } }, ['Charge']),
-      el('button', { class: 'btn btn-ghost btn-block', style: 'margin-top:6px;', onclick: function () { POS.cart = []; POS.renderCart(); } }, ['Clear Sale'])
+      el('button', { class: 'btn btn-ghost btn-block', style: 'margin-top:6px;', onclick: function () { POS.cart = []; POS.clearDraft(); POS.renderCart(); } }, ['Clear Sale'])
     ]);
     return block;
   },
@@ -141,7 +163,7 @@ const POS = {
     const content = el('div', {}, [
       el('div', { class: 'modal-header' }, [el('h2', {}, ['Checkout']), el('button', { class: 'icon-btn', onclick: closeModal }, ['\u00d7'])]),
       el('label', { class: 'field' }, [el('span', {}, ['Customer (optional, required for credit)']), el('select', { id: 'ckCustomer' }, [el('option', { value: '' }, ['Select customer'])])]),
-      el('label', { class: 'field' }, [el('span', {}, ['Discount']), el('input', { type: 'number', id: 'ckDiscount', value: '0', min: '0', step: '0.01' })]),
+      el('label', { class: 'field' }, [el('span', {}, ['Discount']), el('input', { type: 'number', id: 'ckDiscount', value: '0', min: '0', step: '0.01', inputmode: 'decimal', enterkeyhint: 'done' })]),
       el('label', { class: 'field' }, [el('span', {}, ['Sale Notes']), el('input', { id: 'ckNotes', placeholder: 'Optional order note' })]),
       el('div', { class: 'row', style: 'display:flex;justify-content:space-between;font-size:16px;font-weight:700;margin-bottom:16px;' }, [
         el('span', {}, ['Subtotal']), el('span', { class: 'mono' }, [fmtMoney(subtotal)])
@@ -153,7 +175,7 @@ const POS = {
           el('option', { value: 'CREDIT' }, ['Credit (pay later)'])
         ])]),
       el('label', { class: 'field' }, [el('span', {}, ['Amount Received']),
-        el('input', { type: 'number', id: 'ckAmountPaid', value: subtotal, min: '0', step: '0.01' })]),
+        el('input', { type: 'number', id: 'ckAmountPaid', value: subtotal, min: '0', step: '0.01', inputmode: 'decimal', enterkeyhint: 'done' })]),
       el('div', { id: 'ckChange', class: 'kpi-sub', style: 'margin-bottom:12px;' }, ['Change: ' + fmtMoney(0)]),
       el('button', { class: 'btn btn-primary btn-block', onclick: function () { POS.submitSale(subtotal); } }, ['Complete Sale'])
     ]);
@@ -200,6 +222,7 @@ const POS = {
       toast('Sale completed: ' + result.saleId, 'success');
       POS.showReceipt(result);
       POS.cart = [];
+      POS.clearDraft();
       POS.renderCart();
       POS.loadProducts('');
     }).catch(function (err) { toast(friendlyError(err), 'error'); });

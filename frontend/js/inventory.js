@@ -10,7 +10,7 @@ const Inventory = {
         : el('span', {})
     ]);
     panel.appendChild(header);
-    panel.appendChild(el('div', { id: 'invTableWrap', class: 'table-wrap' }, [el('div', { class: 'empty-state' }, ['Loading...'])]));
+    panel.appendChild(el('div', { id: 'invTableWrap', class: 'table-wrap' }, [skeletonTable(7)]));
     container.appendChild(panel);
     this.load();
   },
