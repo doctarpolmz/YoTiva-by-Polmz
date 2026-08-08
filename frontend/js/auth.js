@@ -45,7 +45,18 @@ const Auth = {
     Api.setToken(null);
     localStorage.removeItem('kyabiz_user');
     Auth.user = null;
+    Auth.clearLoginForm();
     Auth.showLogin();
+  },
+
+  clearLoginForm: function () {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) loginForm.reset();
+
+    const emailField = document.getElementById('loginEmail');
+    const passwordField = document.getElementById('loginPassword');
+    if (emailField) emailField.value = '';
+    if (passwordField) passwordField.value = '';
   },
 
   showLogin: function () {
